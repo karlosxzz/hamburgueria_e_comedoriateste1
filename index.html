@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuscuz Delivery - Cardápio Digital</title>
+    <style>
+        :root {
+            --primary: #FF6B00;
+            --primary-hover: #E05E00;
+            --background: #141210; 
+            --surface: #1C1A18;
+            --surface-light: #262421;
+            --text: #FFFFFF;
+            --text-muted: #A6A6A6;
+            --border: #33312E;
+            --success: #22C55E;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(180deg, var(--background) 0%, #0A0908 100%);
+            background-attachment: fixed;
+            color: var(--text);
+            padding-bottom: 90px;
+        }
+
+        header {
+            background: linear-gradient(180px, rgba(255, 107, 0, 0.15) 0%, rgba(20, 18, 16, 1) 100%), var(--surface);
+            padding: 30px 20px 20px 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .store-logo {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 3px solid var(--primary);
+            object-fit: cover;
+            background-color: var(--surface-light);
+            box-shadow: 0 4px 15px rgba(255,107,0,0.3);
+        }
+
+        .store-info h1 {
+            font-size: 24px;
+            margin-top: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .store-info p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: rgba(34, 197, 94, 0.15);
+            color: var(--success);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .status-badge::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background-color: var(--success);
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 1.8s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.6; }
+        }
+
+        .search-container {
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            background-color: rgba(20, 18, 16, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+
+        .search-bar {
+            width: 100%;
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-bar:focus {
+            border-color: var(--primary);
+        }
+
+        .categories-nav {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 5px 20px 15px 20px;
+            scroll-behavior: smooth;
+        }
+
+        .categories-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-btn {
+            background-color: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), background-color 0.2s, box-shadow 0.3s, border-color 0.3s;
+        }
+
+        .category-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 12px rgba(255, 107, 0, 0.15);
+            border-color: var(--primary);
+        }
+
+        .category-btn.active {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: #000000;
+            font-weight: 700;
+        }
+
+        .menu-container {
+            padding: 0 20px;
+        }
+
+        .category-section {
+            margin-bottom: 30px;
+            scroll-margin-top: 130px;
+        }
+
+        .category-title {
+            font-size: 19px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--primary);
+            border-left: 4px solid var(--primary);
+            padding-left: 10px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        @media (min-width: 768px) {
+            .menu-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .product-card {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 12px;
+            display: flex;
+            gap: 12px;
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .product-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 10px;
+            object-fit: cover;
+            background-color: var(--surface-light);
+            flex-shrink: 0;
+        }
+
+        .product-info {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+
+        .product-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.4;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-price {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.85);
+            z-index: 100;
+            display: none;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        @media (min-width: 500px) {
+            .modal-overlay { align-items: center; padding: 20px; }
+        }
+
+        .modal-container {
+            background-color: var(--surface);
+            width: 100%;
+            max-width: 500px;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            max-height: 85vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (min-width: 500px) {
+            .modal-container { border-radius: 20px; max-height: 90vh; }
+        }
+
+        .modal-header-img {
+            width: 100%; height: 220px; object-fit: cover;
+            position: relative; background-color: var(--surface-light);
+        }
+
+        .close-modal-btn {
+            position: absolute; top: 15px; right: 15px;
+            background-color: rgba(0,0,0,0.6); border: none;
+            width: 36px; height: 36px; border-radius: 50%;
+            color: white; font-size: 20px; font-weight: bold;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            z-index: 5;
+        }
+
+        .modal-content { padding: 20px; }
+        .modal-product-title { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+        .modal-product-desc { font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px; }
+
+        .option-group {
+            margin-bottom: 20px; background-color: var(--surface-light);
+            border-radius: 12px; padding: 14px;
+        }
+
+        .option-group-title {
+            font-size: 15px; font-weight: 700; margin-bottom: 12px;
+            display: flex; justify-content: space-between; color: var(--primary);
+        }
+
+        .option-group-subtitle { font-size: 12px; color: var(--text-muted); font-weight: normal; }
+
+        .option-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer;
+        }
+
+        .option-item:last-child { border-bottom: none; }
+        .option-label { display: flex; flex-direction: column; font-size: 14px; }
+        .option-price { font-size: 13px; color: var(--primary); margin-top: 2px; }
+
+        .option-input {
+            appearance: none; width: 20px; height: 20px;
+            border: 2px solid var(--border); border-radius: 4px;
+            outline: none; display: flex; align-items: center; justify-content: center; cursor: pointer;
+        }
+
+        .option-input[type="radio"] { border-radius: 50%; }
+        .option-input:checked { background-color: var(--primary); border-color: var(--primary); }
+        .option-input:checked::after { content: '✓'; color: #000; font-size: 12px; font-weight: bold; }
+
+        .modal-footer {
+            padding: 15px 20px; border-top: 1px solid var(--border);
+            background-color: var(--surface); position: sticky; bottom: 0;
+            display: flex; gap: 15px; align-items: center;
+        }
+
+        .quantity-control {
+            display: flex; align-items: center;
+            border: 1px solid var(--border); border-radius: 8px;
+            overflow: hidden; background-color: var(--surface-light);
+        }
+
+        .qty-btn { background: none; border: none; color: var(--text); width: 38px; height: 38px; font-size: 18px; font-weight: bold; cursor: pointer; }
+        .qty-val { width: 30px; text-align: center; font-weight: 600; font-size: 15px; }
+
+        .add-to-cart-btn {
+            flex-grow: 1; background-color: var(--primary); color: #000;
+            border: none; padding: 12px; border-radius: 8px;
+            font-size: 15px; font-weight: 700; cursor: pointer; text-align: center;
+        }
+
+        /* Carrinho Flutuante */
+        .cart-bar {
+            position: fixed; bottom: 20px; left: 20px; right: 20px;
+            background-color: var(--primary); color: #000;
+            padding: 14px 20px; border-radius: 14px;
+            display: none; justify-content: space-between; align-items: center;
+            font-weight: 700; cursor: pointer; box-shadow: 0 8px 25px rgba(255,107,0,0.4); z-index: 90;
+        }
+
+        .cart-count { background-color: #000; color: var(--primary); padding: 4px 10px; border-radius: 8px; font-size: 13px; }
+
+        /* Tela do Carrinho */
+        .cart-view {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #0A0908; z-index: 110; display: none; flex-direction: column;
+        }
+
+        .cart-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 15px; background-color: var(--surface); }
+        .back-btn { background: none; border: none; color: var(--text); font-size: 24px; cursor: pointer; }
+        .cart-title { font-size: 18px; font-weight: 700; }
+        .cart-items-list { flex-grow: 1; overflow-y: auto; padding: 20px; }
+        .cart-item { background-color: var(--surface); padding: 15px; border-radius: 12px; margin-bottom: 12px; border: 1px solid var(--border); }
+        .cart-item-header { display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 5px; }
+        .cart-item-details { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
+        .remove-item-btn { background: none; border: none; color: #EF4444; font-size: 13px; cursor: pointer; font-weight: 500; }
+
+        .checkout-form { padding: 20px; background-color: var(--surface); border-top: 1px solid var(--border); }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
+        .form-control { width: 100%; background-color: #0A0908; border: 1px solid var(--border); padding: 10px 14px; border-radius: 8px; color: var(--text); font-size: 14px; outline: none; }
+        
+        .checkout-totals { padding: 15px 0; display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
+        .total-row { display: flex; justify-content: space-between; }
+        .total-row.final { font-size: 18px; font-weight: 700; color: var(--primary); border-top: 1px solid var(--border); padding-top: 10px; }
+
+        .submit-order-btn { width: 100%; background-color: var(--primary); color: #000; border: none; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; }
+
+        /* Tela de Pagamento Pix */
+        .payment-view {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #0A0908; z-index: 120; display: none; flex-direction: column;
+            align-items: center; justify-content: center; padding: 20px;
+        }
+
+        .payment-box {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 450px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .pix-title { font-size: 20px; font-weight: 700; margin-bottom: 10px; color: var(--primary); }
+        .pix-price { font-size: 28px; font-weight: 800; color: #FFFFFF; margin-bottom: 15px; }
+        
+        .qr-code-wrapper {
+            background-color: white;
+            padding: 15px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        
+        .qr-code-img { width: 180px; height: 180px; display: block; }
+
+        .pix-loading, .pix-error {
+            width: 180px; height: 180px; display: flex; align-items: center; justify-content: center;
+            text-align: center; font-size: 13px; color: var(--text-muted); padding: 10px; box-sizing: border-box;
+        }
+        .pix-error { color: #EF4444; }
+        
+        .copia-cola-container {
+            background-color: var(--surface-light);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            word-break: break-all;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+            border: 1px dashed var(--border);
+        }
+
+        .btn-copy-pix {
+            background-color: var(--surface-light);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            width: 100%;
+            transition: background-color 0.2s;
+        }
+
+        .btn-copy-pix:hover { background-color: var(--border); }
+        .btn-finish-pix { background-color: var(--success); color: #000; font-size: 16px; font-weight: 700; width: 100%; padding: 14px; border-radius: 10px; border: none; cursor: pointer; }
+        .btn-cancel-pix { background: none; border: none; color: #EF4444; font-size: 14px; cursor: pointer; margin-top: 15px; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=150" alt="Logo" class="store-logo">
+        <div class="store-info">
+            <h1>Cuscuz Delivery</h1>
+            <p>Loja Digital - Escolha suas delícias nordestinas</p>
+            <span class="status-badge">Aberto para pedidos</span>
+        </div>
+    </header>
+
+    <div class="search-container">
+        <input type="text" id="search-input" class="search-bar" placeholder="Buscar no cardápio...">
+    </div>
+
+    <!-- Navegação de Categorias -->
+    <div class="categories-nav" id="categories-nav">
+        <button class="category-btn active" onclick="scrollToCategory('cuscuz', event)">🌽 Cuscuz Recheado</button>
+        <button class="category-btn" onclick="scrollToCategory('hamburguer', event)">🍔 Hambúrguer</button>
+        <button class="category-btn" onclick="scrollToCategory('macaxeira', event)">🍠 Macaxeira</button>
+        <button class="category-btn" onclick="scrollToCategory('batata', event)">🍟 Batata Frita</button>
+        <button class="category-btn" onclick="scrollToCategory('porcoes', event)">🥩 Porções</button>
+        <button class="category-btn" onclick="scrollToCategory('refrigerantes', event)">🥤 Bebidas</button>
+    </div>
+
+    <!-- Container Geral de Itens -->
+    <div class="menu-container" id="menu-container">
+        
+        <!-- Cuscuz Recheado -->
+        <section class="category-section" id="cuscuz">
+            <h2 class="category-title">Cuscuz Recheado</h2>
+            <div class="menu-grid">
+                <div class="product-card" onclick="openProductModal('c1')">
+                    <div class="product-info">
+                        <div>
+                            <div class="product-name">Cuscuz Recheado Tamanho P</div>
+                            <div class="product-desc">Cuscuz - Um clássico nordestino preparado com muito sabor...</div>
+                        </div>
+                        <div class="product-price">R$ 10,00</div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300" class="product-img" alt="Cuscuz P">
+                </div>
+                <div class="product-card" onclick="openProductModal('c2')">
+                    <div class="product-info">
+                        <div>
+                            <div class="product-name">Cuscuz Recheado Tamanho M</div>
+                            <div class="product-desc">Cuscuz um clássico nordestino preparado com muito sabor</div>
+                        </div>
+                        <div class="product-price">R$ 12,00</div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300" class="product-img" alt="Cuscuz M">
+                </div>
+                <div class="product-card" onclick="openProductModal('c3')">
+                    <div class="product-info">
+                        <div>
+                            <div class="product-name">Cuscuz Recheado Tamanho G</div>
+                            <div class="product-desc">Cuscuz um clássico nordestino com proporções generosas e muito recheio.</div>
+                        </div>
+                        <div class="product-price">R$ 14,00</div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300" class="product-img" alt="Cuscuz G">
+                </div>
+                <div class="product-card" onclick="openProductModal('c4')">
+                    <div class="product-info">
+                        <div>
+                            <div class="product-name">Cuscuz M de Tripinha ou Fígado</div>
+                            <div class="product-desc">Cuscuz Raiz - O verdadeiro sabor da culinária nordestina!</div>
+                        </div>
+                        <div class="product-price">R$ 13,00</div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300" class="product-img" alt="Cuscuz M Especial">
+                </div>
+                <div class="product-card" onclick="openProductModal('c5')">
+                    <div class="product-info">
+                        <div>
+                            <div class="product-name">Cuscuz G de Tripinha ou Fígado</div>
+                            <div class="product-desc">Cuscuz Raiz - O verdadeiro sabor da culinária nordestina!</div>
+                        </div>
+                        <div class="product-price">R$ 15,00</div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300" class="product-img" alt="Cuscuz G Especial">
+                </div>
+            </div>
+        </section>
+
+        <!-- Hambúrguer -->
+        <section class="category-section" id="hamburguer">
+            <h2 class="category-title">Hambúrguer</h2>
+            <div class="menu-grid">
+                <div class="product-card" onclick="openProductModal('h1')">
+                    <div class="product-info">
+                        <div>
+                            <div class="product-name">Smash Burger</div>
+                            <div class="product-desc">Smash Burger - clássico que conquista no primeiro pedaço!</div>
+                        </div>
+                        <div class="product-price">R$ 10,00</div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300" class="product-img" alt="Smash Burger">
+                </div>
+                <div class="product-card" onclick="openProductModal('h2')">
+                    <div class="product-info">
+                        <div>
+                            <div class="product-name">Smash Duplo</div>
+                            <div class="product-desc">Dois blends ultra prensados com queijo derretido de forma ideal.</div>
+                        </div>
+                        <div class="product-price">R$ 14,00</div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300" class="product-img" alt="Smash Duplo">
+                </div>
+                <div class="product-card" onclick="openProductModal('h3')">
+                    <div class="product-info">
+                        <div>
+                            <div class="product-name">Smash Salada</div>
+                            <div class="product-desc">Blend Smash perfeitamente prensado acompanhado de salada fresca.</div>
+                        </div>
+                        <div class="product-price">R$ 11,00</div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300" class="product-img" alt="Smash Salada">
+                </div>
+                <div class="product-card" onclick="openProductModal('h4')">
+                    <div class="product-info">
+                        <div>
+                            <div class="product-name">Búrguer Chicken</div>
+                            <div class="product-desc">Burger Chicken - Uma combinação cremosa e cheia de sabor.</div>
+                        </div>
+                        <div class="product-price">R$ 18,00</div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300" class="product-img" alt="Burger Chicken">
+                </div>
+                <div class="product-card" onclick="openProductModal('h5')">
+                    <div class="product-info">
+                        <div>
+                            <div class="product-name">Coleslaw Búrguer</div>
+                            <div class="product-desc">Coleslaw Burger - O equilíbrio perfeito entre o defumado e a crocância.</div>
+                        </div>
+                        <div class="product-price">R$ 10,00</div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300" class="product-img" alt="Coleslaw Burger">
+                </div>
+                <div class="product-card" onclick="openProductModal('h6')">
+                    <div class="product-info">
+                        <div>
+                            <div class="product-name">Big Coalho</div>
+                            <div class="product-desc">Big Coalho - Uma combinação surpreendente de sabores!</div>
+                        </div>
+                        <div class="product-price">R$ 15,00</div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300" class="product-img" alt="Big Coalho">
+                </div>
+                <div class="product-card" onclick="openProductModal('h7')">
+                    <div class="product-info">
+                        <div>
+                            <div class="product-name">Bacon Búrguer</div>
+                            <div class="product-desc">Bacon Burger - Feito para os apaixonados por bacon!</div>
+                        </div>
+                        <div class="product-price">R$ 16,00</div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300" class="product-img" alt="Bacon Burger">
+                </div>
+                <div class="product-card" onclick="openProductModal('h8')">
+                    <div class="product-info">
+                        <div>
+                            <div class="product-name">Búrguer da Casa</div>
+                            <div class="product-desc">Burger de Casa - O sabor que representa a nossa hamburgueria!</div>
+                        </div>
+                        <div class="product-price">R$ 20,00</div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300" class="product-img" alt="Burger de Casa">
+                </div>
+                <div class="product-card" onclick="openProductModal('h9')">
+                    <div class="product-info">
+                        <div>
+                            <div class="product-name">Cebola Grill</div>
+                            <div class="product-desc">Cebola Grill - Uma combinação clássica e cheia de personalidade!</div>
+                        </div>
+                        <div class="product-price">R$ 14,00</div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300" class="product-img" alt="Cebola Grill">
+                </div>
+                <div class="product-card" onclick="openProductModal('h10')">
+                    <div class="product-info">
+                        <div>
+                            <div class="product-name">Eggburguer</div>
+                            <div class="product-desc">Egg Burger - Um clássico irresistível, preparado com ovo fresco e queijo.</div>
+                        </div>
+                        <div class="product-price">R$ 13,00</div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300" class="product-img" alt="Egg Burger">
+                </div>
+            </div>
+        </section>
+
+        <!-- Macaxeira Recheada -->
+        <section class="category-section" id="macaxeira">
+            <h2 class="category-title">Macaxeira Recheada</h2>
+            <div class="menu-grid">
+                <div class="product-card" onclick="openProductModal('m1')">
+                    <div class="product-info">
+                        <div>
+                            <div class="product-name">Macaxeira Tamanho M</div>
+                            <div class="product-desc">Porção saborosa de macaxeira cozida no ponto certo e muito bem recheada.</div>
+                        </div>
+                        <div class="product-price">R$ 12,00</div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1585435557343-3b092031a831?w=300" class="product-img" alt="Macaxeira M">
+                </div>
+                <div class="product-card" onclick="openProductModal('m2')">
+                    <div class="product-info">
+                        <div>
+                            <div class="product-name">Macaxeira Tamanho G</div>
+                            <div class="product-desc">Tamanho grande, perfeita para saciar sua fome com o melhor tempero.</div>
+                        </div>
+                        <div class="product-price">R$ 16,00</div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1585435557343-3b092031a831?w=300" class="product-img" alt="Macaxeira G">
+                </div>
+            </div>
+        </section>
+
+        <!-- Batata Frita -->
+        <section class="category-section" id="batata">
+            <h2 class="category-title">Batata Frita</h2>
+            <div class="menu-grid">
+                <div class="product-card" onclick="openProductModal('b1')">
+                    <div class="product-info">
+                        <div>
+                            <div class="product-name">Batata Frita P</div>
+                            <div class="product-desc">Porção individual de batatas fritas crocantes e douradas.</div>
+                        </div>
+                        <div class="product-price">R$ 10,00</div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=300" class="product-img" alt="Batata P">
+                </div>
+                <div class="product-card" onclick="openProductModal('b2')">
+                    <div class="product-info">
+                        <div>
+                            <div class="product-name">Batata Frita M</div>
+                            <div class="product-desc">Porção média sequinha perfeita para acompanhar seu hambúrguer.</div>
+                        </div>
+                        <div class="product-price">R$ 12,00</div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=300" class="product-img" alt="Batata M">
+                </div>
+                <div class="product-card" onclick="openProductModal('b3')">
+                    <div class="product-info">
+                        <div>
+                            <div class="product-name">Batata Frita G</div>
+                            <div class="product-desc">Porção generosa ideal para dividir com os amigos ou família.</div>
+                        </div>
+                        <div class="product-price">R$ 15,00</div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=300" class="product-img" alt="Batata G">
+                </div>
+                <div class="product-card" onclick="openProductModal('b4')">
+                    <div class="product-info">
+                        <div>
+                            <div class="product-name">Batata Frita M com Cheddar e Bacon</div>
+                            <div class="product-desc">Tamanho médio coberto com uma incrível camada de cheddar cremoso e bacon.</div>
+                        </div>
+                        <div class="product-price">R$ 17,00</div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=300" class="product-img" alt="Batata M Cheddar">
+                </div>
+                <div class="product-card" onclick="openProductModal('b5')">
+                    <div class="product-info">
+                        <div>
+                            <div class="product-name">Batata Frita G com Cheddar e Bacon</div>
+                            <div class="product-desc">Porção grande completíssima com cheddar cremoso e muito bacon crocante.</div>
+                        </div>
+                        <div class="product-price">R$ 20,00</div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=300" class="product-img" alt="Batata G Cheddar">
+                </div>
+            </div>
+        </section>
+
+        <!-- Porções de Tripinha e Fígado -->
+        <section class="category-section" id="porcoes">
+            <h2 class="category-title">Porções de Tripinha e Fígado</h2>
+            <div class="menu-grid">
+                <div class="product-card" onclick="openProductModal('po1')">
+                    <div class="product-info">
+                        <div>
+                            <div class="product-name">Tripinha de Boi</div>
+                            <div class="product-desc">Tripinha de boi douradinha e crocante, preparada no ponto certo.</div>
+                        </div>
+                        <div class="product-price">R$ 20,00</div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=300" class="product-img" alt="Tripinha de Boi">
+                </div>
+                <div class="product-card" onclick="openProductModal('po2')">
+                    <div class="product-info">
+                        <div>
+                            <div class="product-name">Tripinha de Porco</div>
+                            <div class="product-desc">Tripinha de porco douradinha e crocante, preparada no ponto certo.</div>
+                        </div>
+                        <div class="product-price">R$ 20,00</div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=300" class="product-img" alt="Tripinha de Porco">
+                </div>
+                <div class="product-card" onclick="openProductModal('po3')">
+                    <div class="product-info">
+                        <div>
+                            <div class="product-name">Fígado Acebolado</div>
+                            <div class="product-desc">Porção tradicional de fígado acebolado bem temperado e macio.</div>
+                        </div>
+                        <div class="product-price">R$ 20,00</div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=300" class="product-img" alt="Fígado Acebolado">
+                </div>
+            </div>
+        </section>
+
+        <!-- Refrigerantes -->
+        <section class="category-section" id="refrigerantes">
+            <h2 class="category-title">Refrigerantes</h2>
+            <div class="menu-grid">
+                <div class="product-card" onclick="openProductModal('r1')">
+                    <div class="product-info"><div><div class="product-name">Coca Lata</div><div class="product-desc">Lata 350ml trincando de gelada.</div></div><div class="product-price">R$ 6,00</div></div>
+                    <img src="https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=300" class="product-img" alt="Coca Lata">
+                </div>
+                <div class="product-card" onclick="openProductModal('r2')">
+                    <div class="product-info"><div><div class="product-name">Coca Zero Lata</div><div class="product-desc">Lata 350ml sem açúcar e gelada.</div></div><div class="product-price">R$ 6,00</div></div>
+                    <img src="https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=300" class="product-img" alt="Coca Zero">
+                </div>
+                <div class="product-card" onclick="openProductModal('r3')">
+                    <div class="product-info"><div><div class="product-name">Guaraná Lata</div><div class="product-desc">O clássico sabor do Guaraná Antarctica em lata.</div></div><div class="product-price">R$ 6,00</div></div>
+                    <img src="https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=300" class="product-img" alt="Guaraná">
+                </div>
+                <div class="product-card" onclick="openProductModal('r4')">
+                    <div class="product-info"><div><div class="product-name">Guaraná Zero Lata</div><div class="product-desc">Versão sem açúcar em lata geladinha.</div></div><div class="product-price">R$ 6,00</div></div>
+                    <img src="https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=300" class="product-img" alt="Guaraná Zero">
+                </div>
+                <div class="product-card" onclick="openProductModal('r5')">
+                    <div class="product-info"><div><div class="product-name">Fanta Lata</div><div class="product-desc">Fanta Laranja em lata refrescante.</div></div><div class="product-price">R$ 6,00</div></div>
+                    <img src="https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=300" class="product-img" alt="Fanta">
+                </div>
+                <div class="product-card" onclick="openProductModal('r6')">
+                    <div class="product-info"><div><div class="product-name">Soda Lata</div><div class="product-desc">Refrigerante refrescante sabor limão em lata.</div></div><div class="product-price">R$ 6,00</div></div>
+                    <img src="https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=300" class="product-img" alt="Soda">
+                </div>
+                <div class="product-card" onclick="openProductModal('r7')">
+                    <div class="product-info"><div><div class="product-name">Kuat Lata</div><div class="product-desc">Refrigerante de guaraná Kuat em lata.</div></div><div class="product-price">R$ 6,00</div></div>
+                    <img src="https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=300" class="product-img" alt="Kuat">
+                </div>
+                <div class="product-card" onclick="openProductModal('r8')">
+                    <div class="product-info"><div><div class="product-name">Coca Litro</div><div class="product-desc">Garrafa de 1 Litro perfeita para dividir no almoço ou janta.</div></div><div class="product-price">R$ 10,00</div></div>
+                    <img src="https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=300" class="product-img" alt="Coca Litro">
+                </div>
+                <div class="product-card" onclick="openProductModal('r9')">
+                    <div class="product-info"><div><div class="product-name">Guaraná Litro</div><div class="product-desc">Garrafa de 1 Litro bem gelada.</div></div><div class="product-price">R$ 10,00</div></div>
+                    <img src="https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=300" class="product-img" alt="Guaraná Litro">
+                </div>
+                <div class="product-card" onclick="openProductModal('r10')">
+                    <div class="product-info"><div><div class="product-name">Pepsi Litro</div><div class="product-desc">Garrafa de 1 Litro para acompanhar o seu pedido.</div></div><div class="product-price">R$ 10,00</div></div>
+                    <img src="https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=300" class="product-img" alt="Pepsi Litro">
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Barra de Carrinho Flutuante -->
+    <div class="cart-bar" id="cart-bar" onclick="openCartView()">
+        <span class="cart-count" id="cart-bar-count">0</span>
+        <span>Ver meu pedido</span>
+        <span id="cart-bar-total">R$ 0,00</span>
+    </div>
+
+    <!-- Modal de Customização -->
+    <div class="modal-overlay" id="product-modal">
+        <div class="modal-container">
+            <div style="position: relative;">
+                <button class="close-modal-btn" onclick="closeProductModal()">✕</button>
+                <img src="" id="modal-img" class="modal-header-img" alt="Produto">
+            </div>
+            <div class="modal-content">
+                <h3 class="modal-product-title" id="modal-title">Nome do Produto</h3>
+                <p class="modal-product-desc" id="modal-desc">Descrição longa...</p>
+
+                <!-- Variantes Dinâmicas -->
+                <div id="modal-variants-container"></div>
+
+                <!-- Adicionais Extras -->
+                <div class="option-group" id="adicionais-group">
+                    <div class="option-group-title">Adicionais extras <span class="option-group-subtitle">Opcional</span></div>
+                    <div class="option-item">
+                        <div class="option-label"><span>Queijo Coalho</span><span class="option-price">+ R$ 4,00</span></div>
+                        <input type="checkbox" class="option-input adicional-cb" data-name="Queijo Coalho" data-price="4.00">
+                    </div>
+                    <div class="option-item">
+                        <div class="option-label"><span>Bacon fatias</span><span class="option-price">+ R$ 4,00</span></div>
+                        <input type="checkbox" class="option-input adicional-cb" data-name="Bacon" data-price="4.00">
+                    </div>
+                    <div class="option-item">
+                        <div class="option-label"><span>Ovo frito</span><span class="option-price">+ R$ 2,00</span></div>
+                        <input type="checkbox" class="option-input adicional-cb" data-name="Ovo" data-price="2.00">
+                    </div>
+                    <div class="option-item">
+                        <div class="option-label"><span>Cheddar Cremoso</span><span class="option-price">+ R$ 3,50</span></div>
+                        <input type="checkbox" class="option-input adicional-cb" data-name="Cheddar Cremoso" data-price="3.50">
+                    </div>
+                    <div class="option-item">
+                        <div class="option-label"><span>Catupiry Original</span><span class="option-price">+ R$ 4,00</span></div>
+                        <input type="checkbox" class="option-input adicional-cb" data-name="Catupiry Original" data-price="4.00">
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <div class="quantity-control">
+                    <button class="qty-btn" onclick="changeModalQty(-1)">-</button>
+                    <div class="qty-val" id="modal-qty">1</div>
+                    <button class="qty-btn" onclick="changeModalQty(1)">+</button>
+                </div>
+                <button class="add-to-cart-btn" id="add-to-cart-action-btn" onclick="addItemFromModal()">Adicionar R$ 0,00</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela do Carrinho -->
+    <div class="cart-view" id="cart-view">
+        <div class="cart-header">
+            <button class="back-btn" onclick="closeCartView()">←</button>
+            <div class="cart-title">Seu Carrinho</div>
+        </div>
+        <div class="cart-items-list" id="cart-items-list"></div>
+        <div class="checkout-form">
+            <div class="form-group">
+                <label for="user-name">Seu Nome *</label>
+                <input type="text" id="user-name" class="form-control" placeholder="Ex: Maria Souza">
+            </div>
+            <div class="form-group">
+                <label for="user-address">Endereço Completo de Entrega *</label>
+                <input type="text" id="user-address" class="form-control" placeholder="Rua, Número, Bairro, Referência">
+            </div>
+            <div class="form-group">
+                <label for="payment-method">Forma de Pagamento *</label>
+                <select id="payment-method" class="form-control" onchange="toggleTroco()">
+                    <option value="Pix">Pix (Pague pelo celular)</option>
+                    <option value="Cartão">Cartão (Levar Maquininha)</option>
+                    <option value="Dinheiro">Dinheiro</option>
+                </select>
+            </div>
+            <div class="form-group" id="troco-group" style="display: none;">
+                <label for="payment-troco">Troco para quanto?</label>
+                <input type="text" id="payment-troco" class="form-control" placeholder="Ex: R$ 50,00">
+            </div>
+            <div class="form-group" id="cpf-group">
+                <label for="user-cpf">CPF (obrigatório para Pix) *</label>
+                <input type="text" id="user-cpf" class="form-control" placeholder="000.000.000-00" inputmode="numeric" maxlength="14" oninput="maskCpf(this)">
+            </div>
+            <div class="checkout-totals">
+                <div class="total-row"><span>Subtotal</span><span id="checkout-subtotal">R$ 0,00</span></div>
+                <div class="total-row"><span>Entrega</span><span style="color: var(--success); font-weight: 600;">A combinar</span></div>
+                <div class="total-row final"><span>Total</span><span id="checkout-total">R$ 0,00</span></div>
+            </div>
+            <button class="submit-order-btn" onclick="processOrderCheckout()">🚀 Avançar</button>
+        </div>
+    </div>
+
+    <!-- Tela de Pagamento Pix -->
+    <div class="payment-view" id="payment-view">
+        <div class="payment-box">
+            <h3 class="pix-title">Pagamento via Pix</h3>
+            <p style="font-size: 14px; margin-bottom: 5px;">Escaneie ou copie o código abaixo para pagar:</p>
+            <div class="pix-price" id="pix-display-price">R$ 0,00</div>
+            
+            <div class="qr-code-wrapper">
+                <div class="pix-loading" id="pix-loading">⏳ Gerando QR Code Pix...</div>
+                <div class="pix-error" id="pix-error" style="display:none;"></div>
+                <img src="" class="qr-code-img" alt="QR Code Pix" id="pix-qr-img" style="display:none;">
+            </div>
+
+            <div style="text-align: left; font-weight: bold; font-size: 13px; margin-bottom: 5px;">Código Copia e Cola:</div>
+            <div class="copia-cola-container" id="pix-copia-cola-text">suachavepixaqui123456789</div>
+            
+            <button class="btn-copy-pix" onclick="copyPixCode()">📋 Copiar Código Pix</button>
+            
+            <button class="btn-finish-pix" onclick="sendWhatsAppOrder(true)">✅ Já paguei! Enviar Pedido</button>
+            <button class="btn-cancel-pix" onclick="closePaymentView()">Voltar para o carrinho</button>
+        </div>
+    </div>
+
+    <script>
+        // Banco de dados
+        const productsDatabase = {
+            'c1': { name: 'Cuscuz Recheado Tamanho P', basePrice: 10.00, desc: 'Cuscuz - Um clássico nordestino preparado com muito sabor...', img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500', type: 'variant', variantsTitle: 'Opções de Recheio Tradicional', variants: [{name: 'Frango Desfiado', price: 10.00}, {name: 'Carne de Sol', price: 10.00}, {name: 'Calabresa', price: 10.00}, {name: 'Na Manteiga', price: 10.00}] },
+            'c2': { name: 'Cuscuz Recheado Tamanho M', basePrice: 12.00, desc: 'Cuscuz um clássico nordestino preparado com muito sabor', img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500', type: 'variant', variantsTitle: 'Opções de Recheio Tradicional', variants: [{name: 'Frango Desfiado', price: 12.00}, {name: 'Carne de Sol', price: 12.00}, {name: 'Calabresa', price: 12.00}, {name: 'Na Manteiga', price: 12.00}] },
+            'c3': { name: 'Cuscuz Recheado Tamanho G', basePrice: 14.00, desc: 'Cuscuz um clássico nordestino com proporções generosas e muito recheio.', img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500', type: 'variant', variantsTitle: 'Opções de Recheio Tradicional', variants: [{name: 'Frango Desfiado', price: 14.00}, {name: 'Carne de Sol', price: 14.00}, {name: 'Calabresa', price: 14.00}, {name: 'Na Manteiga', price: 14.00}] },
+            'c4': { name: 'Cuscuz M de Tripinha ou Fígado', basePrice: 13.00, desc: 'Cuscuz Raiz - O verdadeiro sabor da culinária nordestina!', img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500', type: 'variant', variantsTitle: 'Escolha a sua Opção', variants: [{name: 'Com Tripinha', price: 13.00}, {name: 'Com Fígado', price: 13.00}] },
+            'c5': { name: 'Cuscuz G de Tripinha ou Fígado', basePrice: 15.00, desc: 'Cuscuz Raiz - O verdadeiro sabor da culinária nordestina!', img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500', type: 'variant', variantsTitle: 'Escolha a sua Opção', variants: [{name: 'Com Tripinha', price: 15.00}, {name: 'Com Fígado', price: 15.00}] },
+
+            'h1': { name: 'Smash Burger', basePrice: 10.00, desc: 'Smash Burger - clássico que conquista no primeiro pedaço!', img: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500', type: 'simple' },
+            'h2': { name: 'Smash Duplo', basePrice: 14.00, desc: 'Dois blends ultra prensados com queijo derretido de forma ideal.', img: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500', type: 'simple' },
+            'h3': { name: 'Smash Salada', basePrice: 11.00, desc: 'Blend Smash perfeitamente prensado acompanhado de salada fresca.', img: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500', type: 'simple' },
+            'h4': { name: 'Búrguer Chicken', basePrice: 18.00, desc: 'Burger Chicken - Uma combinação cremosa e cheia de sabor.', img: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500', type: 'simple' },
+            'h5': { name: 'Coleslaw Búrguer', basePrice: 10.00, desc: 'Coleslaw Burger - O equilíbrio perfeito entre o defumado e a crocância.', img: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500', type: 'simple' },
+            'h6': { name: 'Big Coalho', basePrice: 15.00, desc: 'Big Coalho - Uma combinação surpreendente de sabores!', img: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500', type: 'simple' },
+            'h7': { name: 'Bacon Búrguer', basePrice: 16.00, desc: 'Bacon Burger - Feito para os apaixonados por bacon!', img: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500', type: 'simple' },
+            'h8': { name: 'Búrguer da Casa', basePrice: 20.00, desc: 'Burger de Casa - O sabor que representa a nossa hamburgueria!', img: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500', type: 'simple' },
+            'h9': { name: 'Cebola Grill', basePrice: 14.00, desc: 'Cebola Grill - Uma combinação clássica e cheia de personalidade!', img: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500', type: 'simple' },
+            'h10': { name: 'Eggburguer', basePrice: 13.00, desc: 'Egg Burger - Um clássico irresistível, preparado com ovo fresco e queijo.', img: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500', type: 'simple' },
+
+            'm1': { name: 'Macaxeira Tamanho M', basePrice: 12.00, desc: 'Porção saborosa de macaxeira cozida no ponto certo e muito bem recheada.', img: 'https://images.unsplash.com/photo-1585435557343-3b092031a831?w=500', type: 'simple' },
+            'm2': { name: 'Macaxeira Tamanho G', basePrice: 16.00, desc: 'Tamanho grande, perfeita para saciar sua fome com o melhor tempero.', img: 'https://images.unsplash.com/photo-1585435557343-3b092031a831?w=500', type: 'simple' },
+
+            'b1': { name: 'Batata Frita P', basePrice: 10.00, desc: 'Porção individual de batatas fritas crocantes e douradas.', img: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=500', type: 'simple' },
+            'b2': { name: 'Batata Frita M', basePrice: 12.00, desc: 'Porção média sequinha perfeita para acompanhar seu hambúrguer.', img: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=500', type: 'simple' },
+            'b3': { name: 'Batata Frita G', basePrice: 15.00, desc: 'Porção generosa ideal para dividir com os amigos ou família.', img: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=500', type: 'simple' },
+            'b4': { name: 'Batata Frita M com Cheddar e Bacon', basePrice: 17.00, desc: 'Tamanho médio coberto com uma incrível camada de cheddar cremoso e bacon.', img: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=500', type: 'simple' },
+            'b5': { name: 'Batata Frita G com Cheddar e Bacon', basePrice: 20.00, desc: 'Porção grande completíssima com cheddar cremoso e muito bacon crocante.', img: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=500', type: 'simple' },
+
+            'po1': { name: 'Tripinha de Boi', basePrice: 20.00, desc: 'Tripinha de boi douradinha e crocante, preparada no ponto certo.', img: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=500', type: 'simple' },
+            'po2': { name: 'Tripinha de Porco', basePrice: 20.00, desc: 'Tripinha de porco douradinha e crocante, preparada no ponto certo.', img: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=500', type: 'simple' },
+            'po3': { name: 'Fígado Acebolado', basePrice: 20.00, desc: 'Porção tradicional de fígado acebolado bem temperado e macio.', img: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=500', type: 'simple' },
+
+            'r1': { name: 'Coca Lata', basePrice: 6.00, desc: 'Lata 350ml gelada.', img: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500', type: 'simple', hideAddons: true },
+            'r2': { name: 'Coca Zero Lata', basePrice: 6.00, desc: 'Lata 350ml gelada.', img: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500', type: 'simple', hideAddons: true },
+            'r3': { name: 'Guaraná Lata', basePrice: 6.00, desc: 'Lata 350ml gelada.', img: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500', type: 'simple', hideAddons: true },
+            'r4': { name: 'Guaraná Zero Lata', basePrice: 6.00, desc: 'Lata 350ml gelada.', img: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500', type: 'simple', hideAddons: true },
+            'r5': { name: 'Fanta Lata', basePrice: 6.00, desc: 'Lata 350ml gelada.', img: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500', type: 'simple', hideAddons: true },
+            'r6': { name: 'Soda Lata', basePrice: 6.00, desc: 'Lata 350ml gelada.', img: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500', type: 'simple', hideAddons: true },
+            'r7': { name: 'Kuat Lata', basePrice: 6.00, desc: 'Lata 350ml gelada.', img: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500', type: 'simple', hideAddons: true },
+            'r8': { name: 'Coca Litro', basePrice: 10.00, desc: 'Garrafa de 1 Litro gelada.', img: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500', type: 'simple', hideAddons: true },
+            'r9': { name: 'Guaraná Litro', basePrice: 10.00, desc: 'Garrafa de 1 Litro gelada.', img: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500', type: 'simple', hideAddons: true },
+            'r10': { name: 'Pepsi Litro', basePrice: 10.00, desc: 'Garrafa de 1 Litro gelada.', img: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500', type: 'simple', hideAddons: true }
+        };
+
+        let cart = [];
+        let currentProductId = '';
+        let currentModalQty = 1;
+        let selectedVariantIndex = 0;
+
+        // --- CONFIGURAÇÃO DE CONTATOS E PIX ---
+        const WHATSAPP_NUMBER = '5581999871607';
+        // A API e o cardápio usam o mesmo domínio, tanto localmente quanto na Vercel.
+        // Isso evita chamadas para localhost quando o site estiver publicado.
+        const API_BASE_URL = '';
+
+        let currentPixPaymentId = null;
+        let currentPixCopiaCola = '';
+
+        function openProductModal(id) {
+            currentProductId = id;
+            const product = productsDatabase[id];
+            currentModalQty = 1;
+            selectedVariantIndex = 0;
+
+            document.getElementById('modal-title').innerText = product.name;
+            document.getElementById('modal-desc').innerText = product.desc;
+            document.getElementById('modal-img').src = product.img;
+            document.getElementById('modal-qty').innerText = currentModalQty;
+
+            document.querySelectorAll('.adicional-cb').forEach(cb => cb.checked = false);
+
+            const adicionaisGroup = document.getElementById('adicionais-group');
+            adicionaisGroup.style.display = product.hideAddons ? 'none' : 'block';
+
+            const variantsContainer = document.getElementById('modal-variants-container');
+            variantsContainer.innerHTML = '';
+            
+            if(product.type === 'variant') {
+                let html = `<div class="option-group"><div class="option-group-title">${product.variantsTitle} <span class="option-group-subtitle">Obrigatório escolher 1</span></div>`;
+                product.variants.forEach((v, idx) => {
+                    html += `
+                        <div class="option-item" onclick="setVariant(${idx})">
+                            <div class="option-label"><span>${v.name}</span><span class="option-price">R$ ${v.price.toFixed(2).replace('.', ',')}</span></div>
+                            <input type="radio" name="product-variant" id="var-${idx}" class="option-input" ${idx === 0 ? 'checked' : ''}>
+                        </div>`;
+                });
+                html += `</div>`;
+                variantsContainer.innerHTML = html;
+            }
+
+            updateModalPrice();
+            document.getElementById('product-modal').style.display = 'flex';
+        }
+
+        function closeProductModal() { document.getElementById('product-modal').style.display = 'none'; }
+        function setVariant(idx) { selectedVariantIndex = idx; document.getElementById(`var-${idx}`).checked = true; updateModalPrice(); }
+        function changeModalQty(amount) { currentModalQty += amount; if(currentModalQty < 1) currentModalQty = 1; document.getElementById('modal-qty').innerText = currentModalQty; updateModalPrice(); }
+
+        function calculateSingleItemPrice() {
+            const product = productsDatabase[currentProductId];
+            let price = product.basePrice || 0;
+            if(product.type === 'variant') price = product.variants[selectedVariantIndex].price;
+            if (!product.hideAddons) {
+                document.querySelectorAll('.adicional-cb:checked').forEach(cb => { price += parseFloat(cb.getAttribute('data-price')); });
+            }
+            return price;
+        }
+
+        function updateModalPrice() {
+            const totalPrice = calculateSingleItemPrice() * currentModalQty;
+            document.getElementById('add-to-cart-action-btn').innerText = `Adicionar R$ ${totalPrice.toFixed(2).replace('.', ',')}`;
+        }
+
+        document.querySelectorAll('.adicional-cb').forEach(cb => cb.addEventListener('change', updateModalPrice));
+
+        function addItemFromModal() {
+            const product = productsDatabase[currentProductId];
+            let name = product.name;
+            let finalPrice = calculateSingleItemPrice();
+            let details = [];
+
+            if(product.type === 'variant') name += ` (${product.variants[selectedVariantIndex].name})`;
+            if (!product.hideAddons) {
+                document.querySelectorAll('.adicional-cb:checked').forEach(cb => { details.push(`+ ${cb.getAttribute('data-name')}`); });
+            }
+
+            cart.push({ id: currentProductId, name: name, price: finalPrice, qty: currentModalQty, details: details.join(', ') });
+            closeProductModal();
+            updateCartBar();
+        }
+
+        function updateCartBar() {
+            const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
+            const totalPrice = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+            const cartBar = document.getElementById('cart-bar');
+            if(totalItems > 0) {
+                cartBar.style.display = 'flex';
+                document.getElementById('cart-bar-count').innerText = totalItems;
+                document.getElementById('cart-bar-total').innerText = `R$ ${totalPrice.toFixed(2).replace('.', ',')}`;
+            } else {
+                cartBar.style.display = 'none';
+            }
+        }
+
+        function openCartView() { document.getElementById('cart-view').style.display = 'flex'; renderCartItems(); }
+        function closeCartView() { document.getElementById('cart-view').style.display = 'none'; }
+        
+        function toggleTroco() { 
+            document.getElementById('troco-group').style.display = (document.getElementById('payment-method').value === 'Dinheiro') ? 'block' : 'none'; 
+            document.getElementById('cpf-group').style.display = (document.getElementById('payment-method').value === 'Pix') ? 'block' : 'none';
+        }
+
+        // Aplica a máscara 000.000.000-00 enquanto o usuário digita o CPF
+        function maskCpf(input) {
+            let v = input.value.replace(/\D/g, '').slice(0, 11);
+            v = v.replace(/(\d{3})(\d)/, '$1.$2');
+            v = v.replace(/(\d{3})(\d)/, '$1.$2');
+            v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            input.value = v;
+        }
+
+        // Validação simples de CPF (dígitos verificadores) para evitar enviar um CPF inválido ao Mercado Pago
+        function isValidCpf(cpf) {
+            cpf = cpf.replace(/\D/g, '');
+            if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+            let sum = 0;
+            for (let i = 0; i < 9; i++) sum += parseInt(cpf[i]) * (10 - i);
+            let d1 = (sum * 10) % 11; if (d1 === 10) d1 = 0;
+            if (d1 !== parseInt(cpf[9])) return false;
+            sum = 0;
+            for (let i = 0; i < 10; i++) sum += parseInt(cpf[i]) * (11 - i);
+            let d2 = (sum * 10) % 11; if (d2 === 10) d2 = 0;
+            return d2 === parseInt(cpf[10]);
+        }
+
+        function removeCartItem(idx) { cart.splice(idx, 1); renderCartItems(); updateCartBar(); if(cart.length === 0) closeCartView(); }
+
+        function getCartTotal() {
+            return cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+        }
+
+        function renderCartItems() {
+            const listContainer = document.getElementById('cart-items-list');
+            listContainer.innerHTML = '';
+            let subtotal = getCartTotal();
+            cart.forEach((item, idx) => {
+                const itemTotal = item.price * item.qty;
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'cart-item';
+                itemDiv.innerHTML = `
+                    <div class="cart-item-header"><span>${item.qty}x ${item.name}</span><span>R$ ${itemTotal.toFixed(2).replace('.', ',')}</span></div>
+                    ${item.details ? `<div class="cart-item-details">${item.details}</div>` : ''}
+                    <div><button class="remove-item-btn" onclick="removeCartItem(${idx})">Remover</button></div>`;
+                listContainer.appendChild(itemDiv);
+            });
+            document.getElementById('checkout-subtotal').innerText = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
+            document.getElementById('checkout-total').innerText = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
+        }
+
+    function processOrderCheckout() {
+            const name = document.getElementById('user-name').value.trim();
+            const address = document.getElementById('user-address').value.trim();
+            const payment = document.getElementById('payment-method').value;
+
+            if(!name || !address) { alert('Nome e Endereço de Entrega são obrigatórios.'); return; }
+
+            if (payment === 'Pix') {
+                const cpf = document.getElementById('user-cpf').value.trim();
+                if (!cpf || !isValidCpf(cpf)) {
+                    alert('Informe um CPF válido para gerar o pagamento via Pix.');
+                    return;
+                }
+                openPaymentView();
+            } else {
+                sendWhatsAppOrder(false); // Pedidos normais vão direto
+            }
+        }
+
+        // Abre a tela de pagamento Pix e pede ao backend (Mercado Pago) um QR Code real para essa cobrança
+        async function openPaymentView() {
+            const total = getCartTotal();
+            const formattedTotal = total.toFixed(2).replace('.', ',');
+            const nomeCliente = document.getElementById('user-name').value.trim();
+            const cpf = document.getElementById('user-cpf').value.trim();
+
+            document.getElementById('pix-display-price').innerText = `R$ ${formattedTotal}`;
+            document.getElementById('payment-view').style.display = 'flex';
+
+            // Reseta a tela para o estado de carregamento a cada novo pedido
+            const imgEl = document.getElementById('pix-qr-img');
+            const loadingEl = document.getElementById('pix-loading');
+            const errorEl = document.getElementById('pix-error');
+            imgEl.style.display = 'none';
+            errorEl.style.display = 'none';
+            loadingEl.style.display = 'flex';
+            document.getElementById('pix-copia-cola-text').innerText = '';
+            currentPixPaymentId = null;
+            currentPixCopiaCola = '';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/criar-pix`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ total, nomeCliente, cpf })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Não foi possível gerar o Pix.');
+                }
+
+                currentPixPaymentId = data.paymentId;
+                currentPixCopiaCola = data.copiaECola;
+
+                imgEl.src = `data:image/png;base64,${data.qrCodeBase64}`;
+                document.getElementById('pix-copia-cola-text').innerText = data.copiaECola;
+
+                loadingEl.style.display = 'none';
+                imgEl.style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                loadingEl.style.display = 'none';
+                errorEl.style.display = 'flex';
+                errorEl.innerText = '⚠️ Erro ao gerar o Pix. Verifique se o servidor (server.js) está rodando e tente novamente.';
+            }
+        }
+
+        function closePaymentView() {
+            document.getElementById('payment-view').style.display = 'none';
+        }
+
+        function copyPixCode() {
+            // Copia o código Pix "Copia e Cola" real, gerado pelo Mercado Pago para este pedido
+            if (!currentPixCopiaCola) {
+                alert('O código Pix ainda não foi gerado. Aguarde a geração do QR Code.');
+                return;
+            }
+            navigator.clipboard.writeText(currentPixCopiaCola).then(() => {
+                alert('Código Pix copiado para a área de transferência! Cole no seu aplicativo de banco.');
+            }).catch(err => {
+                alert('Erro ao copiar o código automaticamente. Copie manualmente o texto exibido na tela.');
+            });
+        }
+
+        function sendWhatsAppOrder(isPixPaid = false) {
+            const name = document.getElementById('user-name').value.trim();
+            const address = document.getElementById('user-address').value.trim();
+            const payment = document.getElementById('payment-method').value;
+            const troco = document.getElementById('payment-troco').value.trim();
+
+            let text = `*Novo Pedido* 🍔🌽\n\n*Cliente:* ${name}\n*Endereço:* ${address}\n-------------------------------\n\n`;
+            let subtotal = 0;
+            cart.forEach(item => {
+                const total = item.price * item.qty; subtotal += total;
+                text += `*${item.qty}x ${item.name}*\n`;
+                if(item.details) text += ` _${item.details}_\n`;
+                text += `Valor: R$ ${total.toFixed(2).replace('.', ',')}\n\n`;
+            });
+
+            text += `-------------------------------\n*Subtotal:* R$ ${subtotal.toFixed(2).replace('.', ',')}\n*Taxa de Entrega:* A combinar\n*Pagamento:* ${payment}\n`;
+            
+            if(payment === 'Pix' && isPixPaid) {
+                text += `*Situação:* 💰 Pix Realizado! (Comprovante em anexo)\n`;
+            } else if(payment === 'Dinheiro' && troco) {
+                text += `*Troco para:* ${troco}\n`;
+            }
+
+            window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        function scrollToCategory(id, event) {
+            const section = document.getElementById(id);
+            if(section) section.scrollIntoView({ behavior: 'smooth' });
+            if(event && event.target) {
+                document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+                event.target.classList.add('active');
+            }
+        }
+
+        document.getElementById('search-input').addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase();
+            document.querySelectorAll('.product-card').forEach(card => {
+                const name = card.querySelector('.product-name').innerText.toLowerCase();
+                const desc = card.querySelector('.product-desc').innerText.toLowerCase();
+                card.style.display = (name.includes(query) || desc.includes(query)) ? 'flex' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>
