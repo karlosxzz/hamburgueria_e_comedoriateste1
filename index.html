@@ -1239,30 +1239,42 @@
         }
 
         function sendWhatsAppOrder(isPixPaid = false) {
-            const name = document.getElementById('user-name').value.trim();
-            const address = document.getElementById('user-address').value.trim();
-            const payment = document.getElementById('payment-method').value;
-            const troco = document.getElementById('payment-troco').value.trim();
+    const name = document.getElementById('user-name').value.trim();
+    const address = document.getElementById('user-address').value.trim();
+    const payment = document.getElementById('payment-method').value;
+    const troco = document.getElementById('payment-troco').value.trim();
+    const orderObsElement = document.getElementById('order-obs');
+    const orderObs = orderObsElement ? orderObsElement.value.trim() : '';
 
-            let text = `*Novo Pedido* 🍔🌽\n\n*Cliente:* ${name}\n*Endereço:* ${address}\n-------------------------------\n\n`;
-            let subtotal = 0;
-            cart.forEach(item => {
-                const total = item.price * item.qty; subtotal += total;
-                text += `*${item.qty}x ${item.name}*\n`;
-                if(item.details) text += ` _${item.details}_\n`;
-                text += `Valor: R$ ${total.toFixed(2).replace('.', ',')}\n\n`;
-            });
+    let text = `*Novo Pedido* 🍔🌽\n\n*Cliente:* ${name}\n*Endereço:* ${address}\n-------------------------------\n\n`;
+    
+    let subtotal = 0;
+    cart.forEach(item => {
+        const total = item.price * item.qty; 
+        subtotal += total;
+        text += `*${item.qty}x ${item.name}*\n`;
+        if(item.details) text += `  ➕ *Adicionais:* ${item.details}\n`;
+        if(item.obs) text += `  📝 *Obs do item:* ${item.obs}\n`;
+        text += `  *Valor:* R$ ${total.toFixed(2).replace('.', ',')}\n\n`;
+    });
 
-            text += `-------------------------------\n*Subtotal:* R$ ${subtotal.toFixed(2).replace('.', ',')}\n*Taxa de Entrega:* A combinar\n*Pagamento:* ${payment}\n`;
-            
-            if(payment === 'Pix' && isPixPaid) {
-                text += `*Situação:* 💰 Pix Realizado! (Comprovante em anexo)\n`;
-            } else if(payment === 'Dinheiro' && troco) {
-                text += `*Troco para:* ${troco}\n`;
-            }
+    text += `-------------------------------\n`;
+    text += `*Subtotal:* R$ ${subtotal.toFixed(2).replace('.', ',')}\n`;
+    text += `*Taxa de Entrega:* A combinar\n`;
+    text += `*Pagamento:* ${payment}\n`;
+    
+    if(payment === 'Pix' && isPixPaid) {
+        text += `*Situação:* 💰 Pix Realizado!\n`;
+    } else if(payment === 'Dinheiro' && troco) {
+        text += `*Troco para:* ${troco}\n`;
+    }
 
-            window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(text)}`, '_blank');
-        }
+    if(orderObs) {
+        text += `\n📝 *Obs. Geral do Pedido:* ${orderObs}\n`;
+    }
+
+    window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(text)}`, '_blank');
+}
 
         function scrollToCategory(id, event) {
             const section = document.getElementById(id);
