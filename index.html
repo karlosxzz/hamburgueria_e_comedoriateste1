@@ -853,6 +853,17 @@
                         <input type="checkbox" class="option-input adicional-cb" data-name="Catupiry Original" data-price="4.00">
                     </div>
                 </div>
+
+                <div class="option-group" id="observacao-group">
+                    <div class="option-group-title">Observação <span class="option-group-subtitle">Opcional</span></div>
+                    <textarea 
+                        id="modal-observacao" 
+                        class="form-control" 
+                        rows="2" 
+                        placeholder="Ex: Sem cebola, pão bem passado, molho à parte..." 
+                        style="resize: none;"
+                    ></textarea>
+                </div>
             </div>
 
             <div class="modal-footer">
@@ -999,6 +1010,7 @@
             document.getElementById('modal-desc').innerText = product.desc;
             document.getElementById('modal-img').src = product.img;
             document.getElementById('modal-qty').innerText = currentModalQty;
+            document.getElementById('modal-observacao').value = ''; // Limpa a observação para o novo item
 
             document.querySelectorAll('.adicional-cb').forEach(cb => cb.checked = false);
 
@@ -1051,13 +1063,22 @@
             let name = product.name;
             let finalPrice = calculateSingleItemPrice();
             let details = [];
+            let obsText = document.getElementById('modal-observacao').value.trim();
 
             if(product.type === 'variant') name += ` (${product.variants[selectedVariantIndex].name})`;
             if (!product.hideAddons) {
                 document.querySelectorAll('.adicional-cb:checked').forEach(cb => { details.push(`+ ${cb.getAttribute('data-name')}`); });
             }
 
-            cart.push({ id: currentProductId, name: name, price: finalPrice, qty: currentModalQty, details: details.join(', ') });
+            cart.push({ 
+                id: currentProductId, 
+                name: name, 
+                price: finalPrice, 
+                qty: currentModalQty, 
+                details: details.join(', '),
+                obs: obsText
+            });
+
             closeProductModal();
             updateCartBar();
         }
@@ -1123,6 +1144,7 @@
                 itemDiv.innerHTML = `
                     <div class="cart-item-header"><span>${item.qty}x ${item.name}</span><span>R$ ${itemTotal.toFixed(2).replace('.', ',')}</span></div>
                     ${item.details ? `<div class="cart-item-details">${item.details}</div>` : ''}
+                    ${item.obs ? `<div class="cart-item-obs">📝 <strong>Obs:</strong> ${item.obs}</div>` : ''}
                     <div><button class="remove-item-btn" onclick="removeCartItem(${idx})">Remover</button></div>`;
                 listContainer.appendChild(itemDiv);
             });
@@ -1145,7 +1167,7 @@
                 }
                 openPaymentView();
             } else {
-                sendWhatsAppOrder(false); // Pedidos normais vão direto
+                sendWhatsAppOrder(false);
             }
         }
 
